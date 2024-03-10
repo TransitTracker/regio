@@ -6,9 +6,11 @@ use App\Filament\Resources\Gtfs\StopResource\Pages;
 use App\Filament\Resources\Gtfs\StopResource\RelationManagers;
 use App\Filament\Resources\StopResource\Widgets\StopsMap;
 use App\Models\Gtfs\Stop;
+use App\Models\Helper\Odonym;
 use Filament\Forms;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
 use Filament\Tables;
@@ -26,6 +28,28 @@ class StopResource extends Resource
     {
         return $form
             ->schema([
+                Forms\Components\Fieldset::make('helper_builder')
+                    ->label('Stop builder')
+                    ->schema([
+                        Forms\Components\ToggleButtons::make('helper_type')
+                            ->label('Stop type')
+                            ->grouped()
+                            ->columnSpanFull()
+                            ->options([
+                                'corner' => 'Street corner',
+                                'address' => 'Facing an address',
+                                'place' => 'Place',
+                                'infra' => 'Transportation infrastructure (e.g.: terminus, station)',
+                            ]),
+                        Forms\Components\Select::make('helper_municipality')
+                            ->label('Municipality')
+                            ->searchable()
+                            ->getSearchResultsUsing(fn (string $search): array => Odonym::where('municipality', 'like', "%{$search}%")->limit(50)->distinct('municipality')->pluck('municipality')->toArray()),
+                        Forms\Components\Select::make('helper_travelling_street')
+                            ->label('Street where the vehicle is located')
+                            ->searchable()
+                            ->getSearchResultsUsing(fn (string $search, Get $get): array => Odonym::where('toponym', 'like', "%{$search}%")->where('municipality', $get('helper_municipality'))->limit(50)->pluck('toponym')->toArray()),
+                    ]),
                 Forms\Components\TextInput::make('stop_position')
                     ->required()
                     ->afterStateHydrated(function (TextInput $component, $state) {
