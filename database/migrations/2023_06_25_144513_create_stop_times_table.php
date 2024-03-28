@@ -33,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('stop_times');
+        Schema::dropIfExists('gtfs_stop_times');
     }
 };

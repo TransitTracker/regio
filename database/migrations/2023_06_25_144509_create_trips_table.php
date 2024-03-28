@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('gtfs_trips', function (Blueprint $table) {
             $table->unsignedInteger('route_id');
-            $table->unsignedInteger('service_id');
+            $table->unsignedInteger('service_id')->nullable();
             $table->id('trip_id');
             $table->string('trip_headsign')->nullable();
             $table->string('trip_short_name')->nullable();
@@ -35,6 +35,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('trips');
+        Schema::dropIfExists('gtfs_trips');
     }
 };

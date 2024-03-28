@@ -19,6 +19,9 @@ class ShapeResource extends Resource
     protected static ?string $model = Shape::class;
 
     protected static ?string $navigationIcon = 'gmdi-route';
+    protected static ?string $navigationGroup = 'GTFS Creator';
+    protected static ?string $navigationParentItem = 'Trips';
+    protected static ?int $navigationSort = 3;
 
     public static function form(Form $form): Form
     {

@@ -18,7 +18,8 @@ class OdonymResource extends Resource
     protected static ?string $model = Odonym::class;
 
     protected static ?string $navigationIcon = 'gmdi-label';
-    protected static ?string $navigationGroup = 'Helper';
+    protected static ?string $navigationGroup = 'Helpers';
+    protected static bool $isScopedToTenant = false;
 
     public static function form(Form $form): Form
     {

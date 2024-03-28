@@ -2,6 +2,8 @@
 
 namespace App\Models\Gtfs;
 
+use App\Enums\DropOffType;
+use App\Enums\PickupType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,6 +14,10 @@ class StopTime extends Model
 
     protected $table = 'gtfs_stop_times';
     protected $guarded = [];
+    protected $casts = [
+        'pickup_type' => PickupType::class,
+        'drop_off_type' => DropOffType::class,
+    ];
 
     public function agency(): BelongsTo
     {

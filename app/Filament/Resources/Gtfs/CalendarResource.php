@@ -18,15 +18,18 @@ class CalendarResource extends Resource
     protected static ?string $model = Calendar::class;
 
     protected static ?string $navigationIcon = 'gmdi-calendar-month';
+    protected static ?string $navigationGroup = 'GTFS Creator';
+    protected static ?int $navigationSort = 3;
+    protected static ?string $tenantRelationshipName = 'services';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('agency_id')
-                    ->required()
-                    ->relationship('agency', 'agency_name')
-                    ->columnSpanFull(),
+//                Forms\Components\Select::make('agency_id')
+//                    ->required()
+//                    ->relationship('agency', 'agency_name')
+//                    ->columnSpanFull(),
                 Forms\Components\Toggle::make('monday'),
                 Forms\Components\Toggle::make('tuesday'),
                 Forms\Components\Toggle::make('wednesday'),
@@ -35,9 +38,13 @@ class CalendarResource extends Resource
                 Forms\Components\Toggle::make('saturday'),
                 Forms\Components\Toggle::make('sunday'),
                 Forms\Components\DatePicker::make('start_date')
-                    ->required()->columnSpan(2),
+                    ->required()
+                    ->columnSpan(2)
+                    ->default(now()->startOfMonth()),
                 Forms\Components\DatePicker::make('end_date')
-                    ->required()->columnSpan(2),
+                    ->required()
+                    ->columnSpan(2)
+                    ->default(now()->addYear()->endOfYear()),
                 Forms\Components\TextInput::make('service_description')->columnSpanFull(),
             ])->columns(4);
     }

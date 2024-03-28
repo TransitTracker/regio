@@ -22,7 +22,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('stop_times', function (Blueprint $table) {
+        Schema::table('gtfs_stop_times', function (Blueprint $table) {
+            $table->renameColumn('pickup_type', 'pickup_time');
+            $table->renameColumn('drop_off_type', 'drop_off_time');
             //
         });
     }

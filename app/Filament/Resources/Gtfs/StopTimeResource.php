@@ -19,6 +19,9 @@ class StopTimeResource extends Resource
     protected static ?string $model = StopTime::class;
 
     protected static ?string $navigationIcon = 'gmdi-departure-board';
+    protected static ?string $navigationGroup = 'GTFS Creator';
+    protected static ?string $navigationParentItem = 'Trips';
+    protected static ?int $navigationSort = 1;
 
     public static function table(Table $table): Table
     {

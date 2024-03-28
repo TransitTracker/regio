@@ -5,10 +5,11 @@ namespace App\Models\Gtfs;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Kra8\Snowflake\HasShortflakePrimary;
 
 class Frequency extends Model
 {
-    use HasFactory;
+    use HasFactory, HasShortflakePrimary;
 
     protected $table = 'gtfs_frequencies';
     protected $primaryKey = 'trip_id';

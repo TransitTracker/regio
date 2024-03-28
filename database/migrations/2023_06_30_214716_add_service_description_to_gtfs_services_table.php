@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('gtfs_services', function (Blueprint $table) {
-            //
+            $table->dropColumn('service_description');
         });
     }
 };

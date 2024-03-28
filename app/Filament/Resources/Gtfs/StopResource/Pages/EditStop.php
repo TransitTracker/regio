@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Gtfs\StopResource\Pages;
 
 use App\Filament\Resources\Gtfs\StopResource;
+use Filament\Actions\DeleteAction;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,7 +14,7 @@ class EditStop extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

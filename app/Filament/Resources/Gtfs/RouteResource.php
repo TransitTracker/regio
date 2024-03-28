@@ -4,29 +4,29 @@ namespace App\Filament\Resources\Gtfs;
 
 use App\Enums\RouteType;
 use App\Filament\Resources\Gtfs\RouteResource\Pages;
+use App\Filament\Resources\Gtfs\RouteResource\RelationManagers\TimetablePagesRelationManager;
+use App\Filament\Resources\Gtfs\RouteResource\RelationManagers\TimetablesRelationManager;
+use App\Filament\Resources\Gtfs\RouteResource\RelationManagers\TripsRelationManager;
 use App\Models\Gtfs\Agency;
 use App\Models\Gtfs\Route;
 use Filament\Forms;
-use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 
 class RouteResource extends Resource
 {
     protected static ?string $model = Route::class;
 
     protected static ?string $navigationIcon = 'gmdi-alt-route';
+    protected static ?string $navigationGroup = 'GTFS Creator';
+    protected static ?int $navigationSort = 4;
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('agency_id')
-                    ->required()
-                    ->relationship('agency', 'agency_name')
-                    ->columnSpanFull(),
                 Forms\Components\TextInput::make('route_short_name')
                     ->maxLength(255),
                 Forms\Components\TextInput::make('route_long_name')
@@ -37,8 +37,12 @@ class RouteResource extends Resource
                 Forms\Components\TextInput::make('route_url')
                     ->maxLength(255)
                     ->url(),
-                Forms\Components\ColorPicker::make('route_color'),
-                Forms\Components\ColorPicker::make('route_text_color'),
+                Forms\Components\ColorPicker::make('route_color')
+                    ->afterStateHydrated(fn (Forms\Components\ColorPicker $component, ?string $state) => $component->state("#{$state}"))
+                    ->dehydrateStateUsing(fn (string $state): string => str($state)->remove('#')),
+                Forms\Components\ColorPicker::make('route_text_color')
+                    ->afterStateHydrated(fn (Forms\Components\ColorPicker $component, ?string $state) => $component->state("#{$state}"))
+                    ->dehydrateStateUsing(fn (string $state): string => str($state)->remove('#')),
                 Forms\Components\TextInput::make('route_sort_order')
                     ->numeric()
                     ->required(),
@@ -108,7 +112,9 @@ class RouteResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            TripsRelationManager::class,
+            TimetablesRelationManager::class,
+            TimetablePagesRelationManager::class,
         ];
     }
 

@@ -11,8 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('stop_builders', function (Blueprint $table) {
+        Schema::create('helper_stop_builders', function (Blueprint $table) {
             $table->id();
+            $table->unsignedTinyInteger('stop_id');
+            $table->unsignedTinyInteger('stop_type');
+            $table->string('stop_city')->nullable();
+            $table->unsignedBigInteger('main_street_id')->nullable();
+            $table->unsignedBigInteger('cross_street_id')->nullable();
+            $table->string('place_name')->nullable();
+            $table->string('facing_address')->nullable();
             $table->timestamps();
         });
     }
@@ -22,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('stop_builders');
+        Schema::dropIfExists('helper_stop_builders');
     }
 };

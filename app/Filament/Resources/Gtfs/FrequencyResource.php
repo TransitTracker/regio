@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Gtfs;
 use App\Filament\Resources\Gtfs\FrequencyResource\Pages;
 use App\Filament\Resources\Gtfs\FrequencyResource\RelationManagers;
 use App\Models\Gtfs\Frequency;
+use App\Models\Gtfs\Trip;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -18,6 +19,9 @@ class FrequencyResource extends Resource
     protected static ?string $model = Frequency::class;
 
     protected static ?string $navigationIcon = 'gmdi-schedule';
+    protected static ?string $navigationGroup = 'GTFS Creator';
+    protected static ?string $navigationParentItem = 'Trips';
+    protected static ?int $navigationSort = 2;
 
     public static function form(Form $form): Form
     {
@@ -25,20 +29,27 @@ class FrequencyResource extends Resource
             ->schema([
                 Forms\Components\Select::make('agency_id')
                     ->relationship('agency', 'agency_name')
-                    ->required(),
+                    ->required()
+                    ->live(),
                 Forms\Components\Select::make('trip_id')
-                    ->relationship('trip', 'trip_headsign')
+                    ->relationship(
+                        name: 'trip',
+                        titleAttribute: 'trip_headsign',
+                        modifyQueryUsing: fn (Builder $query, Forms\Get $get) => $query->where('agency_id', $get('agency_id')),
+                    )
+                    ->getOptionLabelFromRecordUsing(fn (Trip $record) => "Route {$record->route->route_short_name} to {$record->trip_headsign}, #{$record->trip_short_name}")
                     ->required(),
-                Forms\Components\TextInput::make('start_time')
-                    ->type('time')
+                Forms\Components\TimePicker::make('start_time')
+                    ->seconds(false)
                     ->required(),
-                Forms\Components\TextInput::make('end_time')
-                    ->type('time')
+                Forms\Components\TimePicker::make('end_time')
+                    ->seconds(false)
                     ->required(),
                 Forms\Components\TextInput::make('headway_secs')
                     ->required()
-                    ->numeric(),
-                Forms\Components\Toggle::make('exact_times'),
+                    ->integer(),
+                Forms\Components\Toggle::make('exact_times')
+                    ->inline(false),
             ]);
     }
 

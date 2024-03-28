@@ -2,10 +2,14 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Tenancy\EditAgencyProfile;
+use App\Filament\Pages\Tenancy\RegisterAgency;
+use App\Models\Gtfs\Agency;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Navigation\NavigationGroup;
+use Filament\Navigation\NavigationItem;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -62,6 +66,23 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->font('Inter')
-            ->databaseNotifications();;
+            ->databaseNotifications()
+            ->navigationGroups([
+                'GTFS Creator',
+                'Helpers',
+                'Admin',
+            ])
+            ->collapsibleNavigationGroups(false)
+            ->navigationItems([
+                NavigationItem::make('Logs viewer')
+                    ->url(fn (): string => route('log-viewer.index'), shouldOpenInNewTab: true)
+                    ->group('Admin')
+                    ->icon('mdi-alert-circle'),
+            ])
+            ->viteTheme('resources/css/filament/admin/theme.css')
+            ->brandName('Transit Tracker Regio')
+            ->tenant(Agency::class)
+            ->tenantRegistration(RegisterAgency::class)
+            ->tenantProfile(EditAgencyProfile::class);
     }
 }

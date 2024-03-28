@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('gtfs_agencies', function (Blueprint $table) {
-            //
+        Schema::table('gtfs_stops', function (Blueprint $table) {
+            $table->dropColumn('agency_id');
         });
     }
 };

@@ -18,6 +18,6 @@ class TripsExport implements FromCollection, WithHeadings
 
     public function headings(): array
     {
-        return ['route_id', 'service_id', 'trip_id', 'trip_headsign', 'shape_id', 'agency_id'];
+        return ['route_id', 'service_id', 'trip_id', 'trip_headsign', 'shape_id', 'agency_id', 'direction_id'];
     }
 }

@@ -6,6 +6,7 @@ use App\Filament\Resources\Gtfs\ShapeResource;
 use App\Filament\Resources\Gtfs\ShapeResource\Widgets\ShapesMap;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\ManageRecords;
+use Filament\Tables\Actions\CreateAction;
 
 class ManageShapes extends ManageRecords
 {
@@ -14,14 +15,13 @@ class ManageShapes extends ManageRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
         ];
     }
 
     protected function getHeaderWidgets(): array
     {
         return [
-            // ShapesMap::class,
+             ShapesMap::class,
         ];
     }
 }

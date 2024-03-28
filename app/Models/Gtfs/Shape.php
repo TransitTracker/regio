@@ -5,12 +5,13 @@ namespace App\Models\Gtfs;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Kra8\Snowflake\HasShortflakePrimary;
 use MatanYadaev\EloquentSpatial\Objects\LineString;
 use MatanYadaev\EloquentSpatial\Traits\HasSpatial;
 
 class Shape extends Model
 {
-    use HasFactory, HasSpatial;
+    use HasFactory, HasSpatial, HasShortflakePrimary;
 
     protected $table = 'gtfs_shapes';
     protected $primaryKey = 'shape_id';

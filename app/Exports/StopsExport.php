@@ -14,11 +14,12 @@ class StopsExport implements FromCollection, WithHeadings
     public function collection()
     {
         return Stop::query()
-            ->select(['stop_id', 'stop_name', 'stop_desc', 'stop_position'])
+            ->select(['stop_id', 'stop_code', 'stop_name', 'stop_desc', 'stop_position'])
             ->get()
             ->map(function (Stop $stop) {
                 return [
                     'stop_id' => $stop->stop_id,
+                    'stop_code' => $stop->stop_code,
                     'stop_name' => $stop->stop_name,
                     'stop_desc' => $stop->stop_desc,
                     'stop_lat' => $stop->stop_position->latitude,
@@ -31,6 +32,7 @@ class StopsExport implements FromCollection, WithHeadings
     {
         return [
             'stop_id',
+            'stop_code',
             'stop_name',
             'stop_desc',
             'stop_lat',

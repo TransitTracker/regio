@@ -7,6 +7,7 @@ use App\Exports\StopsExport;
 use App\Exports\StopTimesExport;
 use App\Exports\TripsExport;
 use App\Filament\Resources\Gtfs\StopTimeResource;
+use App\Models\Gtfs\Shape;
 use App\Models\Gtfs\StopTime;
 use Illuminate\Support\Facades\Route;
 use Maatwebsite\Excel\Facades\Excel;
@@ -28,10 +29,29 @@ Route::get('/', function () {
 });
 
 Route::get('prepare', function () {
-    Excel::store(new AgenciesExport(), 'intercar/agencies.txt', 'public', Formats::CSV);
-    Excel::store(new RoutesExport(), 'intercar/routes.txt', 'public', Formats::CSV);
-    Excel::store(new ServicesExport(), 'intercar/calendar.txt', 'public', Formats::CSV);
-    Excel::store(new StopsExport(), 'intercar/stops.txt', 'public', Formats::CSV);
-    Excel::store(new StopTimesExport(), 'intercar/stop_times.txt', 'public', Formats::CSV);
-    Excel::store(new TripsExport(), 'intercar/trips.txt', 'public', Formats::CSV);
+   dd(Shape::query()
+       ->select(['shape_id', 'shape'])
+       ->get()
+       ->map(function (Shape $shape) {
+           return collect($shape->shape->getCoordinates())
+               ->map(function (array $coordinates, int $key) use ($shape) {
+                   return [
+                       'shape_id' => $shape->shape_id,
+                       'shape_pt_lat' => $coordinates[1],
+                       'shape_pt_lon' => $coordinates[0],
+                       'shape_pt_sequence' => $key,
+                   ];
+               })
+               ->toArray();
+       })
+    ->flatten(1));
+});
+
+Route::get('inverse', function () {
+    $stops = \App\Models\Gtfs\Stop::all();
+
+    foreach ($stops as $stop) {
+        $stop->stop_position = new \MatanYadaev\EloquentSpatial\Objects\Point($stop->stop_position->longitude, $stop->stop_position->latitude);
+        $stop->save();
+    }
 });
