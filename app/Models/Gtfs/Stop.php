@@ -27,9 +27,14 @@ class Stop extends Model
         'stop_position' => Point::class,
     ];
 
-    public function stopAttribute(): BelongsTo
+    /*public function stopAttribute(): BelongsTo
     {
         return $this->belongsTo(StopAttribute::class, 'stop_id', 'stop_id');
+    }*/
+
+    public function agency(): BelongsTo
+    {
+        return $this->belongsTo(Agency::class, 'agency_id', 'agency_id');
     }
 
     public function stopTimes(): HasMany

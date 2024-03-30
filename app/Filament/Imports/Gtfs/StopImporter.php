@@ -58,6 +58,8 @@ class StopImporter extends Importer
         return [
             Hidden::make('agency_id')
                 ->default(Filament::getTenant()->getKey()),
+            \Filament\Forms\Components\Checkbox::make('ignoreSameStopCode')
+                ->helperText('This will create duplicated stops with the same stop_code.'),
         ];
     }
 
@@ -71,14 +73,17 @@ class StopImporter extends Importer
 
     public function resolveRecord(): ?Stop
     {
-//        if ($this->options['ignoreSameStopCode']) {
-//            return new Stop(Arr::only($this->options, 'agency_id'));
-//        }
+        if ($this->options['ignoreSameStopCode']) {
+            return new Stop(Arr::only($this->options, 'agency_id'));
+        }
 
-        return Stop::firstOrNew(['stop_code' => $this->data['stop_code'], 'agency_id' => $this->options['agency_id']]);
-//        if (!$stop->wasRecentlyCreated) {
-//            throw new RowImportFailedException("Stop already exists [{$this->data['stop_code']}].");
-//        }
+        $stop = Stop::firstOrNew(['stop_code' => $this->data['stop_code'], 'agency_id' => $this->options['agency_id']]);
+
+        if (!$stop->wasRecentlyCreated) {
+            throw new RowImportFailedException("Stop already exists [{$this->data['stop_code']}].");
+        }
+
+        return $stop;
     }
 
     public static function getCompletedNotificationBody(Import $import): string

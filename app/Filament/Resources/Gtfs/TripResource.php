@@ -151,8 +151,13 @@ class TripResource extends Resource
                         ->icon('mdi-directions')
                         ->hidden(fn (string $operation): bool => $operation === 'create')
                         ->url(
-                            url: fn (?Trip $record): string => "https://www.google.com/maps/dir/".collect($record->stopTimes)->sortBy('stop_sequence')->map(fn (StopTime $stopTime): string => $stopTime->stop?->stop_position?->latitude.",".$stopTime->stop?->stop_position?->longitude)->join('/'),
+                            url: fn (?Trip $record): string => "https://www.google.com/maps/dir/" . collect($record->stopTimes)->sortBy('stop_sequence')->map(fn (StopTime $stopTime): string => $stopTime->stop?->stop_position?->latitude . "," . $stopTime->stop?->stop_position?->longitude)->join('/'),
                             shouldOpenInNewTab: true,
+                        ),
+                    Forms\Components\Actions\Action::make('manageStopTimes')
+                        ->hidden(fn (string $operation): bool => $operation === 'create')
+                        ->url(
+                            url: fn (?Trip $record): string => self::getUrl('stop-times', ['record' => $record]),
                         ),
                 ])
             ])
@@ -215,8 +220,7 @@ class TripResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-        ];
+        return [];
     }
 
     public static function getPages(): array
@@ -225,6 +229,8 @@ class TripResource extends Resource
             'index' => Pages\ListTrips::route('/'),
             'create' => Pages\CreateTrip::route('/create'),
             'edit' => Pages\EditTrip::route('/{record}/edit'),
+            'map-stop-times' => Pages\MapManageStopTimes::route('/{record}/map-stop-times'),
+            'stop-times' => Pages\ManageStopTimes::route('/{record}/stop-times'),
         ];
     }
 }

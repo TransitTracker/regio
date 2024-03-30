@@ -12,6 +12,7 @@ use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use MatanYadaev\EloquentSpatial\Objects\LineString;
 
@@ -35,20 +36,41 @@ class EditTrip extends EditRecord
                 ->action(function (Trip $record, array $data) {
                     $record->load(['stopTimes:trip_id,stop_id,stop_sequence', 'stopTimes.stop:stop_id,stop_position']);
 
-                    $coordinates = $record->stopTimes->sortBy('stop_sequence')->map(fn (StopTime $stopTime) => $stopTime->stop->toMapboxWaypoint())->join(';');
+                    $coordinatesChunk = $record->stopTimes
+                        ->sortBy('stop_sequence')
+                        ->map(fn (StopTime $stopTime) => $stopTime->stop->toMapboxWaypoint())
+                        ->chunk(24);
 
-                    $response = Http::get("https://api.mapbox.com/directions/v5/mapbox/driving/{$coordinates}", [
-                        'alternatives' => 'false',
-                        'geometries' => 'geojson',
-                        'overview' => 'full',
-                        'steps' => 'false',
-                        'notifications' => 'none',
-                        'access_token' => config('app.mapbox_pk'),
-                    ]);
+                    $newChunks = collect([]);
+                    $coordinatesChunk->each(function (Collection $chunk, $index) use ($coordinatesChunk, $newChunks) {
+                        if ($index > 0) {
+                            $overlappingChunk = $coordinatesChunk[$index - 1]->slice(23)->merge($chunk);
+                            $newChunks->push($overlappingChunk);
+                        } else {
+                            $newChunks->push($chunk);
+                        }
+                    });
+
+                    $responses = collect([]);
+                    $newChunks->each(function (Collection $chunk) use ($responses) {
+                        $response = Http::get("https://api.mapbox.com/directions/v5/mapbox/driving/{$chunk->join(';')}", [
+                            'alternatives' => 'false',
+                            'geometries' => 'geojson',
+                            'overview' => 'full',
+                            'steps' => 'false',
+                            'notifications' => 'none',
+                            'access_token' => config('app.mapbox_pk'),
+                            'continue_straight' => 'false',
+                        ]);
+                        $responses->push($response->json('routes.0.geometry.coordinates'));
+                    });
 
                     $shape = Shape::create([
                         'agency_id' => $this->record->agency_id,
-                        'shape' => LineString::fromArray($response->json('routes.0.geometry')),
+                        'shape' => LineString::fromArray([
+                            'coordinates' => $responses->flatten(1)->all(),
+                            'type' => 'LineString',
+                        ]),
                         'shape_desc' => "{$record->route->route_short_name}: {$data['shape_desc']}",
                     ]);
 
