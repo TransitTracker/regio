@@ -4,9 +4,12 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <title>{{ $title ?? 'Page Title' }}</title>
+        <title>{{ $title ?? 'Transit Tracker Regio' }}</title>
+
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @inertiaHead
     </head>
     <body>
-        {{ $slot }}
+        @inertia
     </body>
 </html>

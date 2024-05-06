@@ -1,6 +1,21 @@
 <div>
     <div id="map" style="width: 100vw; height: 100vh;"></div>
-    <ul id="features"></ul>
+        <md-list x-data="alpineFeatures()" id="features">
+            <md-list-item x-for="feature in features" :key="feature.id">
+                <span x-text="feature.layer.id"></span>
+                <x-gmdi-route slot="start" style="width: 24px;" />
+            </md-list-item>
+        </md-list>
+    <md-dialog open>
+        <div slot="headline">Bienvenue sur Transit Tracker Regio!</div>
+        <form slot="content" id="dialog-intro" method="dialog">
+            Regio n'est pas un planficateur d'itinéraire. C'est plutôt un projet pour voir les liasons de transports en commun existantes.
+            À chaque déplacement, assurez-vous de vérifier les horaires, les tarifs, les modes de réservations auprès du transporteur.
+        </form>
+        <div slot="actions">
+            <md-text-button form="dialog-intro" value="ok">OK</md-text-button>
+        </div>
+    </md-dialog>
     <style>
         #features {
             position: absolute;
@@ -9,12 +24,12 @@
             height: 50vh;
             width: 33.333%;
             overflow: auto;
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 0 25px 25px 0;
-            padding: 1rem 2rem;
-            font-family: sans-serif;
-            font-size: 1.25rem;
-            line-height: 2;
+            /*background: rgba(255, 255, 255, 0.8);*/
+            /*border-radius: 0 25px 25px 0;*/
+            /*padding: 1rem 2rem;*/
+            /*font-family: sans-serif;*/
+            /*font-size: 1.25rem;*/
+            /*line-height: 2;*/
         }
 
         .route-tag {
@@ -29,114 +44,90 @@
             border-radius: 0.5rem;
         }
     </style>
-    @assets
-    <script src='https://unpkg.com/@turf/turf@6/turf.min.js'></script>
-    <link href="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.css" rel="stylesheet">
-    <script src="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.js"></script>
-    @endassets
     @script
     <script>
-        const stops = JSON.parse($wire.stops)
-        const shapes = JSON.parse($wire.shapes)
-
-        mapboxgl.accessToken = 'pk.eyJ1IjoiZmVsaXhpbngiLCJhIjoiY2xqZXpkMzBkMmxkaDNtbDRiOTg0MDdxeCJ9.pX3IAecDleBe0ngEnxJQGw'
-
-        const map = new mapboxgl.Map({
-            container: 'map',
-            center: [-65, 49],
-            zoom: 9,
-            style: 'mapbox://styles/mapbox/streets-v12',
+        const dataModel = () => ({
+            features: [],
+            updateFeatures(newArray) {
+                this.features = newArray
+                console.log(newArray)
+            },
         })
 
-        console.log(shapes)
+        const alpineFeatures = dataModel()
 
-        map.on('load', () => {
+        document.addEventListener('livewire:navigated', () => {
 
-            map.addSource('shapes', {
-                type: 'geojson',
-                data: shapes,
+            const stops = JSON.parse($wire.stops)
+            const shapes = JSON.parse($wire.shapes)
+
+            mapboxgl.accessToken = 'pk.eyJ1IjoiZmVsaXhpbngiLCJhIjoiY2xqZXpkMzBkMmxkaDNtbDRiOTg0MDdxeCJ9.pX3IAecDleBe0ngEnxJQGw'
+
+            const map = new mapboxgl.Map({
+                container: 'map',
+                center: [-65, 49],
+                zoom: 9,
+                style: 'mapbox://styles/mapbox/streets-v12',
             })
 
-            map.addLayer({
-                id: 'shapes',
-                type: 'line',
-                source: 'shapes',
-                paint: {
-                    'line-color': ['get', 'route_color'],
-                    'line-width': 6,
-                },
+            console.log(shapes)
+
+            map.on('load', () => {
+
+                map.addSource('shapes', {
+                    type: 'geojson',
+                    data: shapes,
+                })
+
+                map.addLayer({
+                    id: 'shapes',
+                    type: 'line',
+                    source: 'shapes',
+                    paint: {
+                        'line-color': ['get', 'route_color'],
+                        'line-width': 6,
+                    },
+                })
+
+                map.addSource('stops', {
+                    type: 'geojson',
+                    data: stops,
+                })
+
+                map.addLayer({
+                    id: 'stops',
+                    type: 'circle',
+                    source: 'stops',
+                    paint: {
+                        'circle-color': ['get', 'agency_color'],
+                        'circle-radius': 5,
+                        'circle-stroke-color': ['get', 'agency_text_color'],
+                        'circle-stroke-width': 2,
+                    },
+                })
+
+                const bbox = turfBbox(shapes)
+                console.log(bbox)
+                map.fitBounds(bbox, {
+                    padding: 20
+                })
+
+                console.log(map)
+                console.log($wire)
             })
 
-            map.addSource('stops', {
-                type: 'geojson',
-                data: stops,
+            map.on('click', (e) => {
+                const features = map.queryRenderedFeatures(e.point)
+                    .filter(({
+                                 layer
+                             }) => layer.id === 'stops' || layer.id === 'shapes')
+
+                // alpineFeatures.updateFeatures(features)
             })
 
-            map.addLayer({
-                id: 'stops',
-                type: 'circle',
-                source: 'stops',
-                paint: {
-                    'circle-color': ['get', 'agency_color'],
-                    'circle-radius': 5,
-                    'circle-stroke-color': ['get', 'agency_text_color'],
-                    'circle-stroke-width': 2,
-                },
+            map.on('click', 'shapes', (e) => {
+                console.log(e.features[0])
             })
-
-            const bbox = turf.bbox(shapes)
-            console.log(bbox)
-            map.fitBounds(bbox, {
-                padding: 20
-            })
-
-            console.log(map)
-            console.log($wire)
-        })
-
-        map.on('click', (e) => {
-            const features = map.queryRenderedFeatures(e.point)
-                .filter(({
-                    layer
-                }) => layer.id === 'stops' || layer.id === 'shapes')
-
-            const ul = document.getElementById('features')
-            ul.innerHTML = ''
-
-            features.forEach((feature) => {
-                if (feature.layer.id === 'shapes') {
-                    const li = document.createElement('li')
-                    const a = document.createElement('a')
-                    a.className = 'route-tag'
-                    a.style.backgroundColor = feature.properties.route_color
-                    a.style.color = feature.properties.route_text_color
-                    a.innerText = feature.properties.route_name
-                    a.href = feature.properties.route_url
-                    a.target = '_blank'
-                    li.appendChild(a)
-                    ul.appendChild(li)
-                }
-
-                if (feature.layer.id === 'stops') {
-                    const li = document.createElement('li')
-                    const small = document.createElement('small')
-                    small.className = 'stop-tag'
-                    small.style.backgroundColor = feature.properties.agency_color
-                    small.style.color = feature.properties.agency_text_color
-                    small.innerText = `#${feature.properties.stop_code}`
-
-                    const span = document.createElement('span')
-                    span.innerText = feature.properties.stop_name
-
-                    li.appendChild(span)
-                    li.appendChild(small)
-                    ul.appendChild(li)
-                }
-            })
-        })
-
-        map.on('click', 'shapes', (e) => {
-            console.log(e.features[0])
         })
     </script>
     @endscript
