@@ -1,0 +1,30 @@
+{
+  "resources/css/app.css": {
+    "file": "assets/app-15a0d404.css",
+    "isEntry": true,
+    "src": "resources/css/app.css"
+  },
+  "resources/js/Pages/Map.vue": {
+    "file": "assets/Map-233703ca.js",
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "resources/js/Pages/Map.vue"
+  },
+  "resources/js/app.css": {
+    "file": "assets/app-cc74e1c1.css",
+    "src": "resources/js/app.css"
+  },
+  "resources/js/app.js": {
+    "css": [
+      "assets/app-cc74e1c1.css"
+    ],
+    "dynamicImports": [
+      "resources/js/Pages/Map.vue"
+    ],
+    "file": "assets/app-20133a23.js",
+    "isEntry": true,
+    "src": "resources/js/app.js"
+  }
+}
