@@ -18,6 +18,7 @@ class GeoJsonShapeResource extends JsonResource
             'type' => 'Feature',
             'geometry' => $this->shape,
             'properties' => [
+                'agency_name' => $this->agency?->agency_name,
                 'route_color' => "#{$this->oneTrip?->route?->route_color}",
                 'route_text_color' => "#{$this->oneTrip?->route?->route_text_color}",
                 'route_short_name' => $this->oneTrip?->route?->route_short_name,

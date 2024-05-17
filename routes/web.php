@@ -32,10 +32,10 @@ use Maatwebsite\Excel\Excel as Formats;
 Route::get('/map', RoutesMap::class);
 Route::get('/', function () {
     return Inertia::render('Map', [
-        'shapes' => new GeoJsonShapeCollection(
+        'routes' => new GeoJsonShapeCollection(
             Shape::query()
-                ->select(['shape_id', 'shape'])
-                ->with(['oneTrip:gtfs_trips.route_id,gtfs_trips.shape_id', 'oneTrip.route:gtfs_routes.route_id,route_short_name,route_long_name,route_color,route_text_color,route_url'])
+                ->select(['shape_id', 'shape', 'agency_id'])
+                ->with(['oneTrip:gtfs_trips.route_id,gtfs_trips.shape_id', 'oneTrip.route:gtfs_routes.route_id,route_short_name,route_long_name,route_color,route_text_color,route_url', 'agency:agency_id,agency_name'])
                 ->get()
         ),
         'stops' => new GeoJsonStopCollection(

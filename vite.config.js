@@ -10,6 +10,17 @@ export default defineConfig({
         }),
         vue({
             template: {
+                compilerOptions: {
+                  isCustomElement: (tag) => [
+                      'md-elevated-card',
+                      'md-list',
+                      'md-list-item',
+                      'md-icon',
+                      'md-dialog',
+                      'md-text-button',
+                      'md-fab',
+                  ].includes('tag')
+                },
                 transformAssetUrls: {
                     base: null,
                     includeAbsolute: false,

@@ -21,22 +21,6 @@
             </a>
 
             <span class="grow"></span>
-
-            <span class="relative">
-                <md-text-button id="menu-others-anchor">Autres projets</md-text-button>
-                <md-menu id="menu-others" anchor="menu-others-anchor">
-                    <md-menu-item href="https://www.transittracker.ca" target="_blank">
-                        <div slot="headline">Transit Tracker</div>
-                        <div slot="supporting-text">Application principale</div>
-                    </md-menu-item>
-                    <md-menu-item href="https://vin.transittracker.ca" target="_blank">
-                        <div slot="headline">Projet VIN</div>
-                    </md-menu-item>
-                    <md-menu-item href="https://api.transittracker.ca" target="_blank">
-                        <div slot="headline">API développeur</div>
-                    </md-menu-item>
-                </md-menu>
-            </span>
         </div>
     </nav>
         @inertia
